@@ -1,0 +1,67 @@
+<template>
+  <h4>當前求和為: {{sum}}</h4>
+  <button @click="sum++">點我++</button>
+  <hr>
+  <h2>姓名: {{name}}</h2>
+  <h2>年齡: {{age}}</h2>
+  <h2>薪資: {{job.j1.salary}}K</h2>
+  <h3 v-show="person.car">座駕信息: {{person.car}}</h3>
+  <button @click="name+='~'">修改姓名</button>
+  <button @click="age++">增長年齡</button>
+  <button @click="job.j1.salary++">漲薪</button>
+  <button @click="showRawPerson">輸出最原始的person</button>
+  <button @click="addCar">給人添加一台車</button>
+  <button @click="person.car.name+='!'">換車名</button>
+  <button @click="changePrice">換價格</button>
+</template>
+
+<script>
+import { ref,reactive,toRefs,toRaw,markRaw } from "vue";
+export default {
+  name: "Demo",
+
+  setup() {
+    // 數據
+    let sum = ref(0)
+    let person = reactive({
+      name: '張三',
+      age: 18,
+      job: {
+        j1: {
+          salary: 20
+        }
+      }
+    })
+
+    // toRaw: 輸出最原始的person, 並只能處理reactive的響應式對象
+    function showRawPerson(){
+      const p = toRaw(person)
+      p.age++
+      console.log(p);
+    }
+
+    // markRaw: 使用這個不會變成響應式數據
+    // 使用方式: 有些值不應該設置為響應式，例如第三方庫等
+    // 當渲染具有不可改變數據源的大列表時，跳過響應式轉換可以提高性能
+    function addCar(){
+      let car = {name:'BMW', price:40}
+      person.car = markRaw(car)
+    }
+
+    function changePrice() {
+      person.car.price++
+      console.log(person.car.price);
+    }
+
+    // 返回一個對象(常用)
+    return {
+      sum,
+      person,
+      ...toRefs(person),
+      showRawPerson,
+      addCar,
+      changePrice
+    };
+  },
+};
+</script>
